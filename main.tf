@@ -18,10 +18,10 @@ module "vpc" {
 }
 
 module "ec2" {
-  source         = "./modules/ec2"
-  ami_id         = "ami-084568db4383264d4" # Ubuntu 20.04 in us-east-1
-  instance_type  = "t2.micro"
-  subnet_id      = module.vpc.subnet_id
-  vpc_id         = module.vpc.vpc_id
-  key_name       = "ssh-key"
+  source        = "./modules/ec2"
+  ami_id        = "ami-084568db4383264d4" # Ubuntu 20.04 in us-east-1
+  instance_type = "t2.micro"
+  subnet_id     = module.vpc.subnet_id
+  vpc_id        = module.vpc.vpc_id
+  key_name      = "ssh-key"
 }
