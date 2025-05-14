@@ -35,6 +35,14 @@ jobs:
         run: |
           curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
 
+      - name: Render terraform docs and push changes back to PR
+        uses: terraform-docs/gh-actions@main
+        with:
+          working-dir: ./modules
+          output-file: README.md
+          output-method: inject
+          git-push: "true"
+          
       - name: Terraform format
         run: terraform fmt
  
