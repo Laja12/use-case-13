@@ -2,6 +2,12 @@ name: use-case-13
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   terraform:
@@ -10,6 +16,7 @@ jobs:
     permissions:
       id-token: write
       contents: read
+      pull-requests: write
 
     steps:
       - name: Checkout code
@@ -65,6 +72,32 @@ jobs:
 
       - name: Terraform Validate
         run: terraform validate
+
+      - name: Generate Terraform Docs (README.md)
+        if: github.event_name == 'push' || github.event_name == 'pull_request'
+        uses: terraform-docs/gh-actions@v1.3.0
+        with:
+          working-dir: .
+          output-file: README.md
+          output-method: inject
+          git-push: true
+          config-file: .terraform-docs.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Post Terraform Docs as PR Comment
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2.9.0
+        with:
+          working-dir: .
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          header: "Terraform Documentation"
+          path: ./README.md
 
 
       - name: Apply Terraform plan
